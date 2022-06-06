@@ -6,6 +6,9 @@ let currentResult = defaultResult;
 // Variable globale pour array => Tableau vide qui grandira avec le temps
 let logEntries = [];
 
+// Objet global => package d'infos groupés ensemble donnant plusieurs infos variées de différents types
+
+
 // FONCTION PERMETTANT REFACTORING
 
 // Fonction capturant le user input et le convertissant en int (car string par défaut)
@@ -26,13 +29,21 @@ function createAndWriteOutput( resultBeforeCalculation, operator, newNumber ){
 // FONCTIONS DES 4 OPERATIONS
 
 function add(){
-    const enteredNumber = getUserNumberInput();                         // appel de la fonction getUserNumberInput et sa valeur donnée par return
-    const previousResult = currentResult;                               // récupération de currentResult terme de droite avant ajout enteredNumber
-    console.log('previousResult addition:', previousResult);            // Affichage dans console
-    currentResult = currentResult + enteredNumber;                      // addition => currentResult de gauche et de droite ne sont pas les sames valeurs
-    createAndWriteOutput( previousResult, '+', enteredNumber );         // Affichage résultat + détails calcul => 3 params résultat précédent auquel ajout nouvelle valeur
-    logEntries.push(enteredNumber);                                     // Ajout dans le tableau logEntries (vide de base cf ligne 7) de enteredNumber à chaque click
-    console.log('Array des valeurs ajoutées par add():', logEntries);   // Affichage des valeurs ajoutées par le user 
+    const enteredNumber = getUserNumberInput();                                // appel de la fonction getUserNumberInput et sa valeur donnée par return
+    const previousResult = currentResult;                                      // récupération de currentResult terme de droite avant ajout enteredNumber
+    console.log('previousResult addition:', previousResult);                   // Affichage dans console
+    currentResult = currentResult + enteredNumber;                             // addition => currentResult de gauche et de droite ne sont pas les sames valeurs
+    createAndWriteOutput( previousResult, '+', enteredNumber );                // Affichage résultat + détails calcul => 3 params résultat précédent auquel ajout nouvelle valeur
+    const logEntryPackage = {                                                  // Objet package {clé: valeur} avec mutiples infos
+        operation: 'ADD',
+        previousResult: previousResult,
+        addedNumber: enteredNumber,
+        result: currentResult
+    };
+    logEntries.push(logEntryPackage);                                          // Ajout dans le array logEntries de l'objet logEntryPackage
+    console.log('Array des objets ajoutés par add():', logEntries)             // Affichage Array des différents objets ajoutés
+    // logEntries.push(enteredNumber);                                         // Ajout dans le tableau logEntries (vide de base cf ligne 7) de enteredNumber à chaque click
+    // console.log('Array des valeurs ajoutées par add():', logEntries);       // Affichage des valeurs ajoutées par le user 
 }
 
 
@@ -44,7 +55,7 @@ function subtract(){
     console.log('previousResult soustraction:', previousResult); 
     currentResult = currentResult - enteredNumber;
     // outputResult(calculDescription, currentResult );                  => Refactorisation dans createAndWriteOutput
-    createAndWriteOutput(previousResult, '-', enteredNumber)
+    createAndWriteOutput(previousResult, '-', enteredNumber);
 }
 
 // Ecriture des 2 autres fonctions sans la refactorisation faite avec createAndWriteOutput()
