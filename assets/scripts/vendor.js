@@ -10,7 +10,8 @@ const currentCalculationOutput = document.getElementById('current-calculation');
 // Résultat du calcul
 const currentResultOutput = document.getElementById('current-result');
 
-function outputResult(result, text) {
+// original version de la fonction
+function outputResult(text, result) {
   // détails du calcul
   currentCalculationOutput.textContent = text;
   // résultat
