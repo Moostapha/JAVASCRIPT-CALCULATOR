@@ -6,37 +6,36 @@ let currentResult = defaultResult;
 
 // FONCTIONS PERMETTANT REFACTORING
 
-// Fonction capturant le user input et le convertissant en int (car string par défaut)
-function getUserNumberInput(){
-    // utilisation de return nous permet de capter la valeur et de le use ailleurs | userInput.value est de type string, il faut donc le convertir en int => parseInt() ou +
-    return parseInt(userInput.value); 
+// 1) Fonction capturant le user input et le convertissant en int (car string par défaut capturé par .value)
+
+function getUserNumberInput(){           
+    return parseInt(userInput.value);   // utilisation de return nous permet de capter la valeur et de le use ailleurs | userInput.value est de type string, il faut donc le convertir en int => parseInt() ou +
 }
 
 
-// Fonction donnat le détail du calcul de manière dynamique => Ordre des params est IMPORTANT !!!
-function createAndWriteOutput( resultBeforeCalculation, operator, newNumber ){
-    
-    // OUTPUT TEXT
-    const calculDescription = `${resultBeforeCalculation} ${operator} ${newNumber}`;
-    
-    // appel de la fonction outputResult de vendor.js avec les paramètres dynamiques
-    outputResult(calculDescription, currentResult ); 
+// 2) Fonction donnant le détail du calcul de manière dynamique => Ordre des params est IMPORTANT !!!
+
+function createAndWriteOutput( resultBeforeCalculation, operator, newNumber ){            // Fonction réutilisable avec paramètres différents pour les 4 opérations
+    const calculDescription = `${resultBeforeCalculation} ${operator} ${newNumber}`;     // output text avec backticks => Template litteral mix de var dynamiques et texte, pas besoin de concaténation
+    outputResult(calculDescription, currentResult );                                    // appel de la fonction outputResult de vendor.js avec les paramètres dynamiques
 }
 
-// Variable globale pour array => Tableau vide qui grandira avec le temps
+
+// Variable globale pour array vide => Tableau vide qui grandira avec le temps
 let logEntries = [];
 
 
-// Objet global => package d'infos groupés ensemble donnant plusieurs infos variées de différents types
 
+// 3) Fonction créant un objet , l'affiche dans la console, et l'ajoute au Array logEntries réutilisable avec paramètres différents pour les 4 opérations
 function logEntryPackageInConsole(operation, previousResult, enteredNumber, currentResult){  // 4 params doivent match les valeurs de l'objet 
     
-    // Objet package {clé: valeur} avec mutiples infos | datas groupés, structurés sous forme clé:valeur
-    const logEntryPackage = {                                                  
+    const logEntryPackage = { 
+        
         operation: operation,                 // values === params
-        previousResult: previousResult,       // Clés pointe vers une variable qui est le param. de la fonction de refactorisation
-        enteredNumber: enteredNumber,
-        result: currentResult
+        previousResult: previousResult,      // Clés pointe vers une variable qui est le param. de la fonction de refactorisation
+        enteredNumber: enteredNumber,       // Objet package {clé: valeur} avec mutiples infos | datas groupés, structurés sous forme clé:valeur
+        result: currentResult              // Objet global => package d'infos groupés ensemble donnant plusieurs infos variées de différents types
+        
     };
     
     // Ajout dans le array logEntries de l'objet logEntryPackage
@@ -46,6 +45,46 @@ function logEntryPackageInConsole(operation, previousResult, enteredNumber, curr
     console.log('Array des objets ajoutés par opérations', logEntries) 
 }
 
+// 4) Refactorisation de nos fonctions opération avec if statements => Optimisation du code plus poussée
+// Cette fonction va tester avec des "if clauses" quelle opération effectuer / + - * en prenant pour param le type d'opération
+// Elle permettra de mettre toute la logique des fonctions opérations
+// calculation appelle getUserNumberInput() | createAndWriteOutput() | logEntryPackageInConsole() de manière dynamique selon opération déclenchée par if statements et params
+
+function calculation(calculType){
+    const enteredNumber = getUserNumberInput();
+    const previousResult = currentResult;
+    
+    // var let pour l'opérateur qui changera selon l'opération + - * /, pas d'initialisation de valeur car elle changera selon les blocs if
+    let operatorMath;
+    
+    // cas avec if avec éléments changeants que sont calculType et operatorMath 
+    if (calculType === 'ADD') {
+        currentResult = currentResult + enteredNumber;
+        operatorMath = '+';
+    } 
+    else if (calculType === 'SUBTRACT') {
+        currentResult = currentResult - enteredNumber;
+        operatorMath = '*';
+    } 
+    else if (calculType === 'MULTIPLY') {
+        currentResult = currentResult * enteredNumber;
+        operatorMath = '*';
+    }  
+    else if (calculType === 'DIVIDE') {
+        currentResult = currentResult / enteredNumber;
+        operator = '/';
+    }
+    
+    // Appel fonction ligne 41 avec params adaptés pour - qui devient ici totalement dynamique
+    createAndWriteOutput(previousResult, operatorMath, enteredNumber);
+    // Appel fonction ligne 14 avec params éléments écrits en 'dur' supprimés
+    logEntryPackageInConsole(previousResult , enteredNumber , currentResult);
+    
+    // Appel de calculation() se fera en mettant le bon param => calculation('ADD') déclenchera le bon bloc if
+    /* function add() {
+        calculation ('ADD');
+    }*/
+}
 
 // FONCTIONS DES 4 OPERATIONS
 
@@ -66,12 +105,12 @@ function add(){
     // 5) Affichage résultat + détails calcul => 3 params résultat précédent auquel ajout nouvelle valeur
     createAndWriteOutput( previousResult, '+', enteredNumber ); 
     
-    // 7) Objet package {clé: valeur} avec multiples infos | datas groupés, structurés sous forme clé:valeur
+    // 7) Objet package {clé: valeur} avec multiples infos | datas groupés, structurés sous forme clé:valeur écriture avant refactorinf avec logEntryPackageInConsole()
     const logEntryPackage = {                                                  
         operation: 'ADD',
         previousResult: previousResult,   
         enteredNumber: enteredNumber,
-        result: currentResult
+        result: currentResult          // currentResult valeur de gauche de la ligne 66
     };
     
     // 8) Ajout dans le array logEntries de l'objet logEntryPackage
@@ -125,10 +164,11 @@ function multiply(){
 
 // ASSIGNATION DES FONCTIONS SUR BOUTONS + DECLENCHEMENT AU CLICK
 
+
+// on assigne la fonction add (comme une adresse postale) => excécution indirecte de la fonction. 
+
 // appel fonction add au click sur le bouton +
-// on assigne la fonction add (comme une adresse postale) => excécution indirecte de la fonction add.
-// add() serait incorrect ici => éxécution directe de la fonction or on veut l'éxécuter au click
-addBtn.addEventListener('click', add);  
+addBtn.addEventListener('click', add);                 // add() serait incorrect ici => éxécution directe de la fonction or on veut l'éxécuter au click
 
 // appel fonction subtract au click sur le bouton -
 subtractBtn.addEventListener('click', subtract);
